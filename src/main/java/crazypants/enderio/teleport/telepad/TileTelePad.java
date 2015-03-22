@@ -557,6 +557,12 @@ public class TileTelePad extends TileTravelAnchor implements IInternalPowerRecei
     return true;
   }
 
+  public void updateClientCoords() {
+    if(inNetwork() && master != null) {
+      PacketHandler.sendToAllAround(new PacketUpdateCoords(master, master.getX(), master.getY(), master.getZ(), master.getTargetDim()), master);
+    }
+  }
+
   /* ITravelAccessable overrides */
 
   @Override
