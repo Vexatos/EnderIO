@@ -55,6 +55,7 @@ public class TileTelePad extends TileTravelAnchor implements IInternalPowerRecei
   private TileTelePad master = null;
 
   private boolean autoUpdate = false;
+  private boolean coordsChanged = false;
 
   private BlockCoord target = new BlockCoord();
   private int targetDim = Integer.MIN_VALUE;
@@ -134,6 +135,10 @@ public class TileTelePad extends TileTravelAnchor implements IInternalPowerRecei
       if(progressChanged) {
         lastSyncPowerUsed = getEnergyStored();
         PacketHandler.sendToAllAround(new PacketProgress(this), this);
+      }
+      if(inNetwork() && master != null && master == this && coordsChanged) {
+        coordsChanged = false;
+        PacketHandler.sendToAllAround(new PacketUpdateCoords(master, master.getX(), master.getY(), master.getZ(), master.getTargetDim()), master);
       }
     }
   }
@@ -439,6 +444,7 @@ public class TileTelePad extends TileTravelAnchor implements IInternalPowerRecei
   public ITelePad setTargetDim(int dimID) {
     if (inNetwork()) {
       targetDim = dimID;
+      coordsChanged = true;
       return master;
     }
     return null;
@@ -449,6 +455,7 @@ public class TileTelePad extends TileTravelAnchor implements IInternalPowerRecei
     if(inNetwork()) {
       if(isMaster()) {
         this.target = coords;
+        coordsChanged = true;
       } else {
         this.master.setCoords(coords);
       }
@@ -555,12 +562,6 @@ public class TileTelePad extends TileTravelAnchor implements IInternalPowerRecei
     }
     PacketTravelEvent.doServerTeleport(entity, target.x, target.y, target.z, 0, false, TravelSource.TELEPAD);
     return true;
-  }
-
-  public void updateClientCoords() {
-    if(inNetwork() && master != null) {
-      PacketHandler.sendToAllAround(new PacketUpdateCoords(master, master.getX(), master.getY(), master.getZ(), master.getTargetDim()), master);
-    }
   }
 
   /* ITravelAccessable overrides */
