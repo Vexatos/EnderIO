@@ -47,7 +47,7 @@ public class PacketUpdateCoords extends MessageTileEntity<TileTelePad> implement
   
   @Override
   public IMessage onMessage(PacketUpdateCoords message, MessageContext ctx) {
-    TileTelePad te = message.getTileEntity(message.getWorld(ctx));
+    TileTelePad te = message.getTileEntity(ctx.side.isClient() ? EnderIO.proxy.getClientWorld() : message.getWorld(ctx));
     if(te != null) {
       te.setX(message.targetX);
       te.setY(message.targetY);
