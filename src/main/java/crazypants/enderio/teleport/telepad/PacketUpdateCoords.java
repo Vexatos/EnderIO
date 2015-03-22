@@ -54,6 +54,9 @@ public class PacketUpdateCoords extends MessageTileEntity<TileTelePad> implement
       te.setY(message.targetY);
       te.setZ(message.targetZ);
       te.setTargetDim(message.targetDim);
+      if(ctx.side.isServer()) {
+        te.updateClientCoords();
+      }
     }
     return null;
   }
